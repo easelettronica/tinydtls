@@ -102,7 +102,8 @@ void dsrv_log(log_t level, const char *format, ...) __attribute__ ((format(print
 void dsrv_log(log_t level, const char *format, ...);
 #endif /* !__GNUC__ && !__MINGW32__ */
 #else
-#define dsrv_log(level, format, ...) PRINTF(format, ##__VA_ARGS__)
+//#define dsrv_log(level, format, ...) PRINTF(format, ##__VA_ARGS__)
+void dsrv_log(log_t level, const char *format, ...);
 #endif
 
 /** dumps packets in usual hexdump format */

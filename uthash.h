@@ -80,10 +80,18 @@ typedef unsigned char uint8_t;
 #endif
 
 #ifndef uthash_malloc
+#if CUSTOM_MALLOC
+#define uthash_malloc(sz) DTLS_MALLOC(sz) /* malloc fcn                      */
+#else
 #define uthash_malloc(sz) malloc(sz)      /* malloc fcn                      */
+#endif  /* CUSTOM_MALLOC */
 #endif
 #ifndef uthash_free
-#define uthash_free(ptr,sz) free(ptr)     /* free fcn                        */
+#if CUSTOM_MALLOC
+#define uthash_free(ptr,sz) DTLS_FREE(ptr) /* free fcn                        */
+#else
+#define uthash_free(ptr,sz) free(ptr)      /* free fcn                        */
+#endif  /* CUSTOM_MALLOC */
 #endif
 #ifndef uthash_bzero
 #define uthash_bzero(a,n) memset(a,'\0',n)

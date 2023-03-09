@@ -194,7 +194,15 @@ PROCESS(dtls_retransmit_process, "DTLS retransmit process");
 
 #endif /* WITH_CONTIKI */
 
-#if defined(WITH_CONTIKI) || defined(WITH_LWIP) || defined(IS_MBEDOS)
+#if CUSTOM_MALLOC
+static inline dtls_context_t * malloc_context(void) {
+  return (dtls_context_t *)DTLS_MALLOC(sizeof(dtls_context_t));
+}
+
+static inline void free_context(dtls_context_t *context) {
+  DTLS_FREE(context);
+}
+#elif (WITH_CONTIKI || WITH_LWIP || IS_MBEDOS)
 static dtls_context_t the_dtls_context;
 
 static inline dtls_context_t *
@@ -207,9 +215,7 @@ free_context(dtls_context_t *context) {
   (void)context;
 }
 
-#endif /* WITH_CONTIKI || WITH_LWIP || IS_MBEDOS*/
-
-#ifdef RIOT_VERSION
+#elif RIOT_VERSION
 static inline dtls_context_t *
 malloc_context(void) {
      return (dtls_context_t *) memarray_alloc(&dtlscontext_storage);
@@ -218,9 +224,7 @@ malloc_context(void) {
 static inline void free_context(dtls_context_t *context) {
   memarray_free(&dtlscontext_storage, context);
 }
-#endif /* RIOT_VERSION */
-
-#if defined(WITH_POSIX) || defined(IS_WINDOWS) || defined(WITH_ESPIDF)
+#elif (WITH_POSIX || IS_WINDOWS || WITH_ESPIDF)
 
 static inline dtls_context_t *
 malloc_context(void) {
@@ -236,7 +240,7 @@ free_context(dtls_context_t *context) {
 
 void
 dtls_init(void) {
-  dtls_clock_init();
+  //dtls_clock_init();
   crypto_init();
   netq_init();
   peer_init();
@@ -1798,7 +1802,7 @@ dtls_send_multi(dtls_context_t *ctx, dtls_peer_t *peer,
     netq_t *n = netq_node_new(overall_len);
     if (n) {
       dtls_tick_t now;
-      dtls_ticks(&now);
+      //dtls_ticks(&now);
       n->t = now + 2 * CLOCK_SECOND;
       n->retransmit_cnt = 0;
       n->timeout = 2 * CLOCK_SECOND;
@@ -1857,7 +1861,7 @@ dtls_send_alert(dtls_context_t *ctx, dtls_peer_t *peer, dtls_alert_level_t level
   netq_t *n = netq_node_new(2);
   if (n) {
     dtls_tick_t now;
-    dtls_ticks(&now);
+    //dtls_ticks(&now);
     n->t = now + 2 * CLOCK_SECOND;
     n->retransmit_cnt = 0;
     n->timeout = 2 * CLOCK_SECOND;
@@ -4538,7 +4542,7 @@ dtls_new_context(void *app_data) {
   dtls_context_t *c;
   dtls_tick_t now;
 
-  dtls_ticks(&now);
+  //dtls_ticks(&now);
   dtls_prng_init(now);
 
   c = malloc_context();

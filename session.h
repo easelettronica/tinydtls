@@ -73,13 +73,22 @@ typedef struct {
 #include <net/socket.h>
 #endif /* HAVE_NET_SOCKET_H */
 
-#elif defined(WITH_LWIP) || defined(IS_MBEDOS)
+#elif (WITH_LWIP || IS_MBEDOS)
 #include "lwip/sockets.h"
 #undef write
 #undef read
 typedef unsigned char uint8_t;
 
-#elif defined(IS_WINDOWS)
+#elif WITH_EMNET
+#include "IP.h"
+#undef write
+#undef read
+#undef connect
+#undef send
+typedef unsigned char uint8_t;
+typedef uint32_t socklen_t;
+
+#elif IS_WINDOWS
 #include <winsock2.h>
 #include <ws2tcpip.h>
 
@@ -89,9 +98,21 @@ typedef unsigned char uint8_t;
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #endif /* ! WITH_ZEPHYR  && ! WITH_LWIP */
+#endif /* ! WITH_CONTIKI && ! WITH_RIOT_SOCK && ! WITH_LWIP_NO_LWIP_SOCKET */
 
+#if WITH_EMNET
 typedef struct {
-  socklen_t size;		/**< size of addr */
+  socklen_t size;   /**< size of addr */
+  union {
+    struct sockaddr     sa;
+    struct sockaddr_in  sin;
+    struct sockaddr_in6 sin6;
+  } addr;
+  int ifindex;
+} session_t;
+#else
+typedef struct {
+  socklen_t size;   /**< size of addr */
   union {
     struct sockaddr     sa;
     struct sockaddr_storage st;
@@ -100,7 +121,7 @@ typedef struct {
   } addr;
   int ifindex;
 } session_t;
-#endif /* ! WITH_CONTIKI && ! WITH_RIOT_SOCK && ! WITH_LWIP_NO_LWIP_SOCKET */
+#endif
 
 /** 
  * Resets the given session_t object @p sess to its default

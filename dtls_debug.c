@@ -42,6 +42,7 @@ typedef int in_port_t;
 #include "global.h"
 #include "dtls_debug.h"
 #include "dtls_mutex.h"
+#include "dtls_time.h"
 
 #ifndef min2
 #define min2(a,b) ((a) < (b) ? (a) : (b))
@@ -284,8 +285,7 @@ static char message[DTLS_DEBUG_BUF_SIZE];
  * cannot call each other.  Furthermore, if log_handler() calls dsrv_log() /
  * dtls_dsrv_hexdump_log() there will be a recursive lookup.
  */
-void
-dsrv_log(log_t level, const char *format, ...) {
+void dsrv_log(log_t level, const char *format, ...) {
   va_list ap;
   size_t len;
 #ifndef DTLS_CONSTRAINED_STACK

@@ -24,6 +24,8 @@
 #ifndef _DTLS_TINYDTLS_H_
 #define _DTLS_TINYDTLS_H_
 
+#include "dtls_config.h"
+
 #ifdef RIOT_VERSION
 #include "platform-specific/riot_boards.h"
 #endif /* RIOT_VERSION */
@@ -33,12 +35,13 @@
 #endif /* CONTIKI */
 
 #if defined(_WIN32) || defined(_WIN64)
+#undef IS_WINDOWS
 #define IS_WINDOWS 1
 #endif
 
 #define WITH_SHA256 1
 
-#if defined WITH_LWIP || defined(IS_MBEDOS)
+#if (WITH_LWIP || IS_MBEDOS)
 #include "platform-specific/lwip_platform.h"
 #endif
 
@@ -50,7 +53,6 @@
 #ifndef WITH_ESPIDF
 #ifndef WITH_POSIX
 /* TODO: To remove in a future */
-#define WITH_POSIX 1
 #endif /* WITH_POSIX */
 #endif /* WITH_ESPIDF */
 #endif /* IS_WINDOWS */
@@ -65,5 +67,21 @@
 #error "TinyDTLS requires at least one Cipher suite!"
 #endif /* DTLS_PSK */
 #endif /* DTLS_ECC */
+
+#if (WITH_EMNET && WITH_LWIP)
+#error "Only one network library can be selected!"
+#endif /* (WITH_EMNET && WITH_LWIP) */
+
+#if (IS_WINDOWS && IS_MBEDOS)
+#error "Only one platform can be selected!"
+#endif /* (IS_WINDOWS && IS_MBEDOS) */
+
+#if (WITH_EMNET && (IS_MBEDOS || IS_WINDOWS))
+#error "Platform or network library configuration error!"
+#endif /* (IS_WINDOWS && IS_MBEDOS) */
+
+/*
+ * TODO: We have to add other checks!
+ */
 
 #endif /* _DTLS_TINYDTLS_H_ */

@@ -90,7 +90,7 @@ void crypto_init(void)
 }
 
 static dtls_handshake_parameters_t *dtls_handshake_malloc(void) {
-  return malloc(sizeof(dtls_handshake_parameters_t));
+  return DTLS_MALLOC(sizeof(dtls_handshake_parameters_t));
 }
 
 static void dtls_handshake_dealloc(dtls_handshake_parameters_t *handshake) {
@@ -98,7 +98,7 @@ static void dtls_handshake_dealloc(dtls_handshake_parameters_t *handshake) {
 }
 
 static dtls_security_parameters_t *dtls_security_malloc(void) {
-  return malloc(sizeof(dtls_security_parameters_t));
+  return DTLS_MALLOC(sizeof(dtls_security_parameters_t));
 }
 
 static void dtls_security_dealloc(dtls_security_parameters_t *security) {

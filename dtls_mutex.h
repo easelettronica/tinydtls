@@ -22,7 +22,7 @@
 #ifndef _DTLS_MUTEX_H_
 #define _DTLS_MUTEX_H_
 
-#if defined(RIOT_VERSION)
+#if RIOT_VERSION
 
 #include <mutex.h>
 
@@ -32,7 +32,7 @@ typedef mutex_t dtls_mutex_t;
 #define dtls_mutex_trylock(a) mutex_trylock(a)
 #define dtls_mutex_unlock(a) mutex_unlock(a)
 
-#elif defined(WITH_CONTIKI) || defined(IS_MBEDOS)
+#elif WITH_CONTIKI || IS_MBEDOS
 
 /* CONTIKI does not support mutex */
 
@@ -42,7 +42,7 @@ typedef int dtls_mutex_t;
 #define dtls_mutex_trylock(a) *(a) = 1
 #define dtls_mutex_unlock(a) *(a) = 0
 
-#elif defined(WITH_ZEPHYR) || defined(IS_WINDOWS) || defined(WITH_LWIP)
+#elif WITH_ZEPHYR || IS_WINDOWS || WITH_LWIP
 
 /* zephyr supports mutex, but this port doesn't use it */
 
@@ -54,8 +54,7 @@ typedef int dtls_mutex_t;
 #define dtls_mutex_trylock(a) *(a) = 1
 #define dtls_mutex_unlock(a) *(a) = 0
 
-
-#else /* ! RIOT_VERSION && ! WITH_CONTIKI && ! WITH_ZEPHYR && ! IS_WINDOWS */
+#elif WITH_PTHREAD
 
 #include <pthread.h>
 
@@ -64,6 +63,14 @@ typedef pthread_mutex_t dtls_mutex_t;
 #define dtls_mutex_lock(a) pthread_mutex_lock(a)
 #define dtls_mutex_trylock(a) pthread_mutex_trylock(a)
 #define dtls_mutex_unlock(a) pthread_mutex_unlock(a)
+
+#else /* ! RIOT_VERSION && ! WITH_CONTIKI && ! WITH_ZEPHYR && ! IS_WINDOWS */
+
+typedef void* dtls_mutex_t;
+#define DTLS_MUTEX_INITIALIZER 0
+#define dtls_mutex_lock(a)
+#define dtls_mutex_trylock(a)
+#define dtls_mutex_unlock(a)
 
 #endif /* ! RIOT_VERSION && ! WITH_CONTIKI && ! IS_WINDOWS */
 

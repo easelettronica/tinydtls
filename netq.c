@@ -32,7 +32,17 @@
 LOG_MODULE_DECLARE(TINYDTLS, CONFIG_TINYDTLS_LOG_LEVEL);
 #endif /* WITH_ZEPHYR */
 
-#if !(defined (WITH_CONTIKI)) && !(defined (RIOT_VERSION))
+#if CUSTOM_MALLOC
+static inline netq_t *
+netq_malloc_node(size_t size) {
+  return (netq_t *)DTLS_MALLOC(sizeof(netq_t) + size);
+}
+
+static inline void
+netq_free_node(netq_t *node) {
+  DTLS_FREE(node);
+}
+#elif !(defined (WITH_CONTIKI)) && !(defined (RIOT_VERSION))
 #include <stdlib.h>
 
 static inline netq_t *

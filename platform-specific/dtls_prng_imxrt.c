@@ -6,43 +6,38 @@
  * and Eclipse Distribution License v. 1.0 which accompanies this distribution.
  *
  * The Eclipse Public License is available at http://www.eclipse.org/legal/epl-v10.html
- * and the Eclipse Distribution License is available at 
+ * and the Eclipse Distribution License is available at
  * http://www.eclipse.org/org/documents/edl-v10.php.
  *
  * Contributors:
  *    Olaf Bergmann  - initial API and implementation
  *    Hauke Mehrtens - memory optimization, ECC integration
+ *    Achim Kraus    - session recovery
+ *    Sachin Agrawal - rehandshake support
  *    Jon Shallow    - platform dependent prng support
  *
  *******************************************************************************/
 
 #include "tinydtls.h"
+#include "dtls_prng.h"
+#include <stdlib.h>
 
-#if defined (WITH_CONTIKI)
-#include "platform-specific/dtls_prng_contiki.c"
+/**
+ * Fills \p buf with \p len random bytes. This is the default
+ * implementation for prng().  You might want to change prng() to use
+ * a better PRNG on your specific platform.
+ */
+int
+dtls_prng(unsigned char *buf, size_t len) {
+  for(unsigned int i = 0U; i < len; ++i) {
+    buf[i] = rand() % 255;
+  }
+  return len;
+}
 
-#elif defined (WITH_ESPIDF)
-#include "platform-specific/dtls_prng_espidf.c"
+void
+dtls_prng_init(unsigned seed) {
+  srand(seed);
+  return;
+}
 
-#elif defined (RIOT_VERSION)
-#include "platform-specific/dtls_prng_riot.c"
-
-#elif defined (WITH_ZEPHYR)
-#include "platform-specific/dtls_prng_zephyr.c"
-
-#elif defined (IS_WINDOWS)
-#include "platform-specific/dtls_prng_win.c"
-
-#elif defined (WITH_LWIP) || defined (IS_MBEDOS)
-#include "platform-specific/dtls_prng_lwip.c"
-
-#elif defined (WITH_POSIX)
-#include "platform-specific/dtls_prng_posix.c"
-
-#elif defined (WITH_IMXRT)
-#include "platform-specific/dtls_prng_imxrt.c"
-
-#else
-#error platform specific prng not defined
-
-#endif

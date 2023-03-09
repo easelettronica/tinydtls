@@ -79,7 +79,7 @@ _dtls_address_equals_impl(const session_t *a,
  case AF_INET6:
    return a->addr.sin6.sin6_port == b->addr.sin6.sin6_port && 
      memcmp(&a->addr.sin6.sin6_addr, &b->addr.sin6.sin6_addr, 
-	    sizeof(struct in6_addr)) == 0;
+	    sizeof(in6_addr)) == 0;
  default: /* fall through and signal error */
    ;
  }
@@ -114,7 +114,11 @@ session_t*
 dtls_new_session(struct sockaddr *addr, socklen_t addrlen) {
   session_t *sess;
 
+#if CUSTOM_MALLOC
+  sess = DTLS_MALLOC(sizeof(session_t));
+#else
   sess = malloc(sizeof(session_t));
+#endif
   if (!sess)
     return NULL;
   dtls_session_init(sess);
@@ -127,7 +131,11 @@ dtls_new_session(struct sockaddr *addr, socklen_t addrlen) {
 
 void
 dtls_free_session(session_t *sess) {
+#if CUSTOM_MALLOC
+  DTLS_FREE(sess);
+#else
   free(sess);
+#endif
 }
 
 struct sockaddr*
