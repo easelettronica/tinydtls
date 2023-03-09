@@ -94,7 +94,7 @@ static dtls_handshake_parameters_t *dtls_handshake_malloc(void) {
 }
 
 static void dtls_handshake_dealloc(dtls_handshake_parameters_t *handshake) {
-  free(handshake);
+  DTLS_FREE(handshake);
 }
 
 static dtls_security_parameters_t *dtls_security_malloc(void) {
@@ -102,7 +102,7 @@ static dtls_security_parameters_t *dtls_security_malloc(void) {
 }
 
 static void dtls_security_dealloc(dtls_security_parameters_t *security) {
-  free(security);
+  DTLS_FREE(security);
 }
 #elif defined (WITH_CONTIKI) /* WITH_CONTIKI */
 
